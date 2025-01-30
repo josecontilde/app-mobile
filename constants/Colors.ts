@@ -10,17 +10,21 @@ export const Colors = {
   light: {
     text: '#11181C',
     background: '#fff',
-    tint: tintColorLight,
+    tint: '#0a7ea4',
     icon: '#687076',
     tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    tabIconSelected: '#0a7ea4',
+    inputBackground: '#F5F5F5', // 👈 Fondo más claro para los inputs
+    inputText: '#11181C', // 👈 Texto oscuro en los inputs
   },
   dark: {
     text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
+    background: '#1E1E1E',
+    tint: '#fff',
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    tabIconSelected: '#fff',
+    inputBackground: '#FFFFFF',
+    inputText: '#1E1E1E',
   },
 };
