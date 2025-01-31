@@ -11,7 +11,7 @@ class TeamController extends Controller
     function index(Request $request)
     {
         $data = [
-            'teams' => $request->user()->teams,
+            'teams' => $request->user()->teams()->with(['tasks.creator'])->get(),
         ];
         return response()->json($data, 200);
     }
@@ -111,5 +111,33 @@ class TeamController extends Controller
         return response()->json($data, 200);
     }
 
-    
+    function leave(Request $request)
+    {
+        $team = $request->user()->teams()->find($request->team);
+        if (!$team) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Team not found',
+            ], 404);
+        }
+        
+        $isOwner = $team->members()->where('user_id', $request->user()->id)
+                        ->where('role', 'owner')->exists();
+        
+        if ($isOwner) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Team owner cannot leave the team',
+            ], 403);
+        }
+
+        $team->members()->detach($request->user()->id);
+        $data = [
+            'status' => true,
+            'message' => 'Left team',
+        ];
+        return response()->json($data, 200);
+    }
+
+  
 }

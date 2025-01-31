@@ -48,4 +48,45 @@ class TaskController extends Controller
         ];
         return response()->json($data, 201);
     }
+
+    function show(Request $request)
+    {
+        $task = Task::where('team_id', $request->team)
+            ->where('id', $request->task)
+            ->first();
+
+        $data = [
+            'status' => true,
+            'message' => 'Task found',
+            'task' => $task,
+        ];
+        if (!$task) {
+            $data = [
+                'status' => false,
+                'message' => 'Task not found',
+            ];
+        }
+        return response()->json($data, 200);
+    }
+
+    function destroy(Request $request)
+    {
+        $task = Task::where('team_id', $request->team)
+            ->where('id', $request->task)
+            ->first();
+
+        if (!$task) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Task not found',
+            ], 404);
+        }
+
+        $task->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Task deleted',
+        ], 200);
+    }
 }

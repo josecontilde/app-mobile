@@ -8,17 +8,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register'])->name('api.register');
+Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return ['user' => $request->user()];
     });
     Route::get('/users', function (Request $request) {
-        return $request->user()->all();
+        return ['users' => $request->user()->all()];
     });
 
 
@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{team}', [TeamController::class, 'show']);
         Route::put('/{team}', [TeamController::class, 'update']);
         Route::delete('/{team}', [TeamController::class, 'destroy']);
+        Route::delete('/{team}/leave', [TeamController::class, 'leave']);
 
         Route::get('/{team}/member', [TeamMemberController::class, 'index']);
         Route::post('/{team}/member', [TeamMemberController::class, 'store']);
@@ -35,5 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/{team}/task', [TaskController::class, 'index']);
         Route::post('/{team}/task', [TaskController::class, 'store']);
+        Route::get('/{team}/task/{task}', [TaskController::class, 'show']);
+        
+        Route::delete('/{team}/task/{task}', [TaskController::class, 'destroy']);
     });
 });
