@@ -30,7 +30,6 @@ export default function RegisterScreen() {
       }
 
       try {
-        // Hacer la solicitud al backend para registrar al usuario
         const response = await fetch("http://192.168.0.18:8000/api/login", {
           method: "POST",
           headers: {
@@ -48,15 +47,13 @@ export default function RegisterScreen() {
         const data = await response.json();
 
         if (response.ok) {
-          const { token } = data; // Obtener el token de la respuesta
+          const { token } = data;
 
-          // Guardar el token en SecureStore
           await SecureStore.setItemAsync("access_token", token);
 
           Alert.alert("Registro exitoso", "Ahora puedes iniciar sesión");
-          router.replace("/(auth)/login"); // Redirigir al login después del registro
+          router.replace("/(auth)/login");
         } else {
-          // Manejo de error si la respuesta no es exitosa
           Alert.alert(
             "Error",
             data.message || "Hubo un problema al registrar el usuario"
@@ -119,7 +116,6 @@ export default function RegisterScreen() {
       />
       <Button title="Registrarse" onPress={handleRegister} />
 
-      {/* Enlace para volver al login */}
       <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
         <Text style={styles.link}>¿Ya tienes cuenta? Inicia sesión</Text>
       </TouchableOpacity>

@@ -1,31 +1,59 @@
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { useState } from "react";
+import { Alert, Button, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function CreateTeamScreen() {
   const router = useRouter();
-  const [teamName, setTeamName] = useState('');
+  const [teamName, setTeamName] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleCreateTeam = () => {
+  const handleCreateTeam = async () => {
     if (!teamName.trim()) {
-      Alert.alert('Error', 'El nombre del equipo no puede estar vacío');
+      Alert.alert("Error", "El nombre del equipo no puede estar vacío");
       return;
     }
 
-    // Aquí deberías hacer una petición a tu backend para guardar el equipo
-    console.log('Equipo creado:', teamName);
+    setLoading(true);
 
-    Alert.alert('Éxito', `El equipo "${teamName}" fue creado exitosamente`);
-    
-    // Redirigir al panel de administración
-    router.replace('/admin/manage-teams');
+    try {
+      const token = await SecureStore.getItemAsync("access_token");
+      if (!token) {
+        Alert.alert("Error", "No estás autenticado");
+        return;
+      }
+
+      const response = await fetch("http://192.168.0.18:8000/api/team", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: teamName,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.status) {
+        Alert.alert("Éxito", `El equipo "${teamName}" fue creado exitosamente`);
+        router.replace("/admin/teams");
+      } else {
+        Alert.alert("Error", "Hubo un problema al crear el equipo");
+      }
+    } catch (error) {
+      console.error("Error al crear el equipo:", error);
+      Alert.alert("Error", "Hubo un error en la comunicación con el servidor");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: '#FFFFFF' }]}>
+    <View style={[styles.container, { backgroundColor: "#FFFFFF" }]}>
       <Text style={styles.title}>Crear Nuevo Equipo</Text>
 
-      {/* Entrada del nombre del equipo */}
       <TextInput
         style={styles.input}
         placeholder="Nombre del equipo"
@@ -33,8 +61,11 @@ export default function CreateTeamScreen() {
         onChangeText={setTeamName}
       />
 
-      {/* Botón para crear el equipo */}
-      <Button title="Crear Equipo" onPress={handleCreateTeam} />
+      <Button
+        title={loading ? "Creando..." : "Crear Equipo"}
+        onPress={handleCreateTeam}
+        disabled={loading}
+      />
     </View>
   );
 }
@@ -42,20 +73,20 @@ export default function CreateTeamScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   input: {
-    width: '100%',
+    width: "100%",
     padding: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 5,
     marginBottom: 20,
   },

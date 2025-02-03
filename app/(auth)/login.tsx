@@ -38,7 +38,7 @@ export default function LoginScreen() {
           // Guardar token en SecureStore
           await SecureStore.setItemAsync("access_token", token);
           Alert.alert("Login exitoso", `Bienvenido ${user.name}`);
-          router.replace("/admin/dashboard"); // Redirigir a todos al dashboard
+          router.replace("/admin/dashboard");
         } else {
           Alert.alert("Error", "Credenciales incorrectas");
         }
